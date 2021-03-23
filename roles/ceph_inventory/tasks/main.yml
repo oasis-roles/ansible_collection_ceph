@@ -1,0 +1,50 @@
+# role tasks
+- name: Set platform/version specific variables
+  include_vars: "{{ __rolename_vars_file }}"
+  loop:
+    - "{{ ansible_facts.os_family }}.yml"
+    - "{{ ansible_facts.distribution }}.yml"
+    - "{{ ansible_facts.distribution }}_{{ ansible_facts.distribution_major_version }}.yml"
+    - "{{ ansible_facts.distribution }}_{{ ansible_facts.distribution_version }}.yml"
+  vars:
+    __rolename_vars_file: "{{ role_path }}/vars/{{ item }}"
+  when: __rolename_vars_file is file
+
+- name: Check for destination directory
+  stat:
+    path: "{{ ceph_inventory_destination | dirname }}"
+  register: _ceph_inventory_stat
+
+- name: Ensure that {{ ceph_inventory_destination | dirname }} exists
+  file:
+    path: "{{ ceph_inventory_destination | dirname }}"
+    state: directory
+    owner: "{{ ceph_inventory_owner }}"
+    group: "{{ ceph_inventory_group }}"
+    mode: 0644
+  when: not _ceph_inventory_stat.stat.exists
+
+# It is possible to have a writable file in a non-writable directory
+- name: Check if the file is writable
+  stat:
+    path: "{{ ceph_inventory_desination }}"
+  register: _ceph_inventory_file_stat
+
+# Checks that either we just created a writable directory OR the file
+# already exists and is writable OR that the directory was already
+# writable
+- name: Be sure that path is writable
+  assert:
+    that: >-
+      _ceph.inventory_stat.stat.writable
+      or not _ceph_inventory_stat.stat.exists
+      or _ceph_inventory_file_stat.stat.writable
+    fail_msg: >-
+      Please ensure that the destination for the Ceph inventory
+      is a writable directory
+
+- name: Write a ceph-ansible compatible inventory
+  template:
+    src: ceph_inventory.j2
+    dest: "{{ ceph_inventory_destination }}"
+    mode: 0644

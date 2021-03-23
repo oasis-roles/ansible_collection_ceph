@@ -1,0 +1,56 @@
+[adm]
+{% for host in groups[ceph_inventory_adm_group] %}
+{{ host }}
+{% endfor %}
+
+[adm:vars]
+{% for key, val in ceph_inventory_vars %}
+{{ key }} = {{ val }}
+{% endfor %}
+
+[mgrs]
+{% for host in groups[ceph_inventory_mgrs_group] %}
+{{ host }}
+{% endfor %}
+
+[mgrs:vars]
+{% for key, val in ceph_inventory_vars %}
+{{ key }} = {{ val }}
+{% endfor %}
+
+[mons]
+{% for host in groups[ceph_inventory_mons_group] %}
+{{ host }}
+{% endfor %}
+
+[mons:vars]
+{% for key, val in ceph_inventory_vars %}
+{{ key }} = {{ val }}
+{% endfor %}
+
+[osds]
+{% for host in groups[ceph_inventory_osds_group] %}
+{{ host }}
+{% endfor %}
+
+[osds:vars]
+{% for key, val in ceph_inventory_vars %}
+{{ key }} = {{ val }}
+{% endfor %}
+
+[rgws]
+{% for host in groups[ceph_inventory_rgws_group] %}
+{{ host }}
+{% endfor %}
+
+[rgws:vars]
+{% for key, val in ceph_inventory_vars %}
+{{ key }} = {{ val }}
+{% endfor %}
+
+{# Reuse adm host as grafana-server -#}
+{# At least one grafana server is required for ceph 4 deployments -#}
+[grafana-server]
+{% for host in groups[ceph_inventory_adm_group] %}
+{{ host }}
+{% endfor %}

@@ -1,0 +1,118 @@
+# role tasks
+- name: Set platform/version specific variables
+  include_vars: "{{ __rolename_vars_file }}"
+  loop:
+    - "{{ ansible_facts.os_family }}.yml"
+    - "{{ ansible_facts.distribution }}.yml"
+    - "{{ ansible_facts.distribution }}_{{ ansible_facts.distribution_major_version }}.yml"
+    - "{{ ansible_facts.distribution }}_{{ ansible_facts.distribution_version }}.yml"
+  vars:
+    __rolename_vars_file: "{{ role_path }}/vars/{{ item }}"
+  when: __rolename_vars_file is file
+
+- name: Install ceph-ansible package
+  become: true
+  become_user: "{{ prepare_adm_become_user }}"
+  package:
+    name: "{{ prepare_adm_packages }}"
+    state: present
+
+- become: "{{ prepare_adm_target_user != ansible_user }}"
+  become_user: "{{ prepare_adm_become_user }}"
+  block:
+    - name: Ensure that install prefix exists
+      file:
+        path: "{{ prepare_adm_destination }}"
+        state: directory
+        owner: "{{ prepare_adm_target_user }}"
+
+    - name: Create {{ prepare_adm_ceph_ansible_keys_dir }} directory
+      file:
+        path: "{{ prepare_adm_ceph_ansible_keys_dir }}"
+        state: directory
+        mode: 0700
+        owner: "{{ prepare_adm_target_user }}"
+        group: "{{ prepare_adm_target_group }}"
+
+    - name: >
+        Create /etc/ansible/group_vars symlink to
+        /usr/share/ceph-ansible/group_vars
+      file:
+        path: /etc/ansible/group_vars
+        src: /usr/share/ceph-ansible/group_vars
+        state: link
+        owner: root
+        group: root
+
+    - name: >
+        Copy /usr/share/ceph-ansible/site.yml.sample to
+        /usr/share/ceph-ansible/site.yml
+      copy:
+        remote_src: true
+        src: /usr/share/ceph-ansible/site.yml.sample
+        dest: /usr/share/ceph-ansible/site.yml
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Copy local inventory file to system if it exists
+      copy:
+        src: "{{ prepare_adm_inventory_file }}"
+        dest: "{{ prepare_adm_destination }}/hosts"
+        owner: "{{ prepare_adm_target_user }}"
+        group: "{{ prepare_adm_target_group }}"
+        mode: 0644
+      when: prepare_adm_inventory_file is is_file
+
+    - name: Create group_vars directory
+      file:
+        path: "{{ prepare_adm_destination }}/group_vars"
+        state: directory
+        owner: "{{ prepare_adm_target_user }}"
+        group: "{{ prepare_adm_target_group }}"
+        mode: 0755
+
+    - name: Copy local group_vars files to destination
+      action: "{{ (prepare_adm_group_vars_template | ternary('template', 'copy') }}"
+      args:
+        src: "{{ item }}"
+        dest: "{{ prepare_adm_destination }}/group_vars"
+        owner: "{{ prepare_adm_target_user }}"
+        group: "{{ prepare_adm_target_group }}"
+        mode: 0644
+      with_fileglob:
+        - "{{ prepare_adm_group_vars_dir }}/*"
+
+    - name: Configure remote ansible.cfg
+      ini_file:
+        path: "{{ prepare_adm_destination }}/ansible.cfg"
+        section: defaults
+        option: "{{ item.key }}"
+        value: "{{ item.value }}"
+      with_dict: "{{ prepare_adm_ansible_cfg }}"
+
+    - name: Create remote log directory
+      file:
+        path: "{{ prepare_adm_ansible_cfg.log_path | dirname }}"
+        state: directory
+        mode: 0755
+        owner: "{{ prepare_adm_target_user }}"
+        group: "{{ prepare_adm_target_group }}"
+      when: "'log_path' in prepare_adm_ansible_cfg"
+
+    - name: Configure /usr/share/ceph-ansible/ansible.cfg
+      ini_file:
+        path: /usr/share/ceph-ansible/ansible.cfg
+        section: defaults
+        option: "{{ item.key }}"
+        value: "{{ item.value }}"
+      with_dict: "{{ prepare_adm_ansible_cfg }}"
+
+    - name: Copy local SSH key to remote control machine
+      copy:
+        src: "{{ prepare_adm_ssh_private_key_file }}"
+        dest: "{{ prepare_adm_ansible_cfg.private_key_file }}"
+        owner: "{{ prepare_adm_target_user }}"
+        group: "{{ prepare_adm_target_group }}"
+        mode: 0600
+      when: "'private_key_file' in prepare_adm_ansible_cfg"

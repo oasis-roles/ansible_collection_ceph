@@ -1,0 +1,1 @@
+../ceph-ansible/library/ceph_pool.py

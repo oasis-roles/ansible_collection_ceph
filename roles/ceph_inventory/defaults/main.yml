@@ -1,0 +1,9 @@
+ceph_inventory_adm_group: adm
+ceph_inventory_mgrs_group: mgrs
+ceph_inventory_mons_group: mons
+ceph_inventory_osds_group: osds
+ceph_inventory_rgws_group: rgws
+ceph_inventory_grafana_group: "{{ ceph_inventory_adm_group }}"
+ceph_inventory_vars:
+  ansible_ssh_extra_vars: '-o StrictHostKeyChecking=no'
+ceph_inventory_destination: ceph_inventory
