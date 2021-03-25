@@ -25,6 +25,7 @@
         path: "{{ prepare_adm_destination }}"
         state: directory
         owner: "{{ prepare_adm_target_user }}"
+        mode: u+rwx
 
     - name: Create {{ prepare_adm_ceph_ansible_keys_dir }} directory
       file:
@@ -62,7 +63,9 @@
         owner: "{{ prepare_adm_target_user }}"
         group: "{{ prepare_adm_target_group }}"
         mode: 0644
-      when: prepare_adm_inventory_file is is_file
+      when:
+        - prepare_adm_inventory_file is not none
+        - prepare_adm_inventory_file is file
 
     - name: Create group_vars directory
       file:
@@ -73,7 +76,7 @@
         mode: 0755
 
     - name: Copy local group_vars files to destination
-      action: "{{ (prepare_adm_group_vars_template | ternary('template', 'copy') }}"
+      action: "{{ prepare_adm_group_vars_template | ternary('template', 'copy') }}"
       args:
         src: "{{ item }}"
         dest: "{{ prepare_adm_destination }}/group_vars"
@@ -89,6 +92,8 @@
         section: defaults
         option: "{{ item.key }}"
         value: "{{ item.value }}"
+        create: true
+        mode: u+rw
       with_dict: "{{ prepare_adm_ansible_cfg }}"
 
     - name: Create remote log directory
@@ -106,6 +111,8 @@
         section: defaults
         option: "{{ item.key }}"
         value: "{{ item.value }}"
+        create: true
+        mode: u+rw
       with_dict: "{{ prepare_adm_ansible_cfg }}"
 
     - name: Copy local SSH key to remote control machine

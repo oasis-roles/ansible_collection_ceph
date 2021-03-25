@@ -10,41 +10,19 @@
     __rolename_vars_file: "{{ role_path }}/vars/{{ item }}"
   when: __rolename_vars_file is file
 
-- name: Check for destination directory
-  stat:
-    path: "{{ ceph_inventory_destination | dirname }}"
-  register: _ceph_inventory_stat
+- become: "{{ ceph_inventory_become }}"
+  become_user: "{{ ceph_inventory_become_user }}"
+  block:
+    - name: Ensure that {{ ceph_inventory_destination | dirname }} exists
+      file:
+        path: "{{ ceph_inventory_destination | dirname }}"
+        state: directory
+        owner: "{{ ceph_inventory_owner }}"
+        group: "{{ ceph_inventory_group }}"
+        mode: o+rwx
 
-- name: Ensure that {{ ceph_inventory_destination | dirname }} exists
-  file:
-    path: "{{ ceph_inventory_destination | dirname }}"
-    state: directory
-    owner: "{{ ceph_inventory_owner }}"
-    group: "{{ ceph_inventory_group }}"
-    mode: 0644
-  when: not _ceph_inventory_stat.stat.exists
-
-# It is possible to have a writable file in a non-writable directory
-- name: Check if the file is writable
-  stat:
-    path: "{{ ceph_inventory_desination }}"
-  register: _ceph_inventory_file_stat
-
-# Checks that either we just created a writable directory OR the file
-# already exists and is writable OR that the directory was already
-# writable
-- name: Be sure that path is writable
-  assert:
-    that: >-
-      _ceph.inventory_stat.stat.writable
-      or not _ceph_inventory_stat.stat.exists
-      or _ceph_inventory_file_stat.stat.writable
-    fail_msg: >-
-      Please ensure that the destination for the Ceph inventory
-      is a writable directory
-
-- name: Write a ceph-ansible compatible inventory
-  template:
-    src: ceph_inventory.j2
-    dest: "{{ ceph_inventory_destination }}"
-    mode: 0644
+    - name: Write a ceph-ansible compatible inventory
+      template:
+        src: ceph_inventory.j2
+        dest: "{{ ceph_inventory_destination }}"
+        mode: o+rw

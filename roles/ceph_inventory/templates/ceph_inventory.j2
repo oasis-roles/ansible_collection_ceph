@@ -4,7 +4,7 @@
 {% endfor %}
 
 [adm:vars]
-{% for key, val in ceph_inventory_vars %}
+{% for key, val in ceph_inventory_vars.items() %}
 {{ key }} = {{ val }}
 {% endfor %}
 
@@ -14,7 +14,7 @@
 {% endfor %}
 
 [mgrs:vars]
-{% for key, val in ceph_inventory_vars %}
+{% for key, val in ceph_inventory_vars.items() %}
 {{ key }} = {{ val }}
 {% endfor %}
 
@@ -24,7 +24,7 @@
 {% endfor %}
 
 [mons:vars]
-{% for key, val in ceph_inventory_vars %}
+{% for key, val in ceph_inventory_vars.items() %}
 {{ key }} = {{ val }}
 {% endfor %}
 
@@ -34,7 +34,7 @@
 {% endfor %}
 
 [osds:vars]
-{% for key, val in ceph_inventory_vars %}
+{% for key, val in ceph_inventory_vars.items() %}
 {{ key }} = {{ val }}
 {% endfor %}
 
@@ -44,7 +44,7 @@
 {% endfor %}
 
 [rgws:vars]
-{% for key, val in ceph_inventory_vars %}
+{% for key, val in ceph_inventory_vars.items() %}
 {{ key }} = {{ val }}
 {% endfor %}
 

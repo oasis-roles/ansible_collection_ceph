@@ -1,11 +1,10 @@
 prepare_adm_become: true
 prepare_adm_become_user: root
 
-# Variables that the user must define
 # Local directory from whence to copy group_vars
 #prepare_adm_group_vars_dir: files/prepare_adm/group_vars
 # Inventory file to upload
-#prepare_adm_inventory_file: files/prepare_adm/hosts
+prepare_adm_inventory_file: ~
 
 # True if the group_vars should be template processed as they'
 # get transferred, false otherwise

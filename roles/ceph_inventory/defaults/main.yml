@@ -1,3 +1,6 @@
+ceph_inventory_become: true
+ceph_inventory_become_user: root
+
 ceph_inventory_adm_group: adm
 ceph_inventory_mgrs_group: mgrs
 ceph_inventory_mons_group: mons
@@ -6,4 +9,6 @@ ceph_inventory_rgws_group: rgws
 ceph_inventory_grafana_group: "{{ ceph_inventory_adm_group }}"
 ceph_inventory_vars:
   ansible_ssh_extra_vars: '-o StrictHostKeyChecking=no'
-ceph_inventory_destination: ceph_inventory
+ceph_inventory_destination: /etc/ansible/hosts
+ceph_inventory_owner: root
+ceph_inventory_group: "{{ ceph_inventory_owner }}"
