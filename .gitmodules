@@ -1,6 +1,3 @@
 [submodule "tests"]
 	path = tests
 	url = https://github.com/oasis-roles/meta_test
-[submodule "plugins/ceph-ansible"]
-	path = plugins/ceph_ansible
-	url = https://github.com/ceph/ceph-ansible.git
