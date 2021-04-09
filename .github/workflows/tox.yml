@@ -18,7 +18,7 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     outputs:
-      scenarios: "${{ steps.collection.outputs.scenarios }}"
+      scenarios: "${{ steps.collection.outputs.tox-envs }}"
     steps:
       - uses: actions/checkout@v2
         with:
@@ -29,12 +29,8 @@ jobs:
         run: |
           set -ex
           python -m pip install --upgrade tox
-      - name: Collect dependencies
+      - uses: greg-hellings/tox-list@v1
         id: collection
-        run: |
-          set -ex
-          json="$(tox -ql --ansible-driver docker --ansible-driver podman | python -c 'import json; import sys; print(json.dumps(sys.stdin.read().strip().split("\n"))))"
-          echo "::set-output name=scenarios::${json}"
 
   build:
     needs: collect
