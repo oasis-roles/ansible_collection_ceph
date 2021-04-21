@@ -2,11 +2,8 @@
 
 # Ansible Collection - oasis_roles.ceph
 
-**BEFORE YOU PROCEED** Add the tests folder as a submodule and edit this file.
-
-```bash
-git submodule add https://github.com/oasis-roles/meta_test tests
-```
+A collection of roles and playbooks to use with preparing a system to install
+and run the `ceph_ansible` playbooks provided by the upstream Ceph repository.
 
 Each role is documented individually within its root folder by its own README.md
 where details of its usage, arguments, and dependencies can be found.
