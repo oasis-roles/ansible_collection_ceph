@@ -14,7 +14,6 @@ name: Test with Ansible
       - prereleased
 
 env:
-  TOX_ANSIBLE_DRIVER: podman
   ANSIBLE_COLLECTIONS_PATH: ~/.ansible:~/work
   checkout_path: ansible_collections/oasis_roles/ceph
 
@@ -36,6 +35,8 @@ jobs:
       - name: collect depenencies
         id: collection
         uses: greg-hellings/tox-list@v1
+        with:
+          tox-args: --ansible-driver podman --ansible-driver docker
 
   build:
     needs: collect
