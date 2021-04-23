@@ -14,8 +14,6 @@ prepare_adm_destination: /etc/ansible
 # User on the remote system who will own the files
 prepare_adm_target_user: root
 prepare_adm_target_group: "{{ prepare_adm_target_user }}"
-# SSH key to use
-prepare_adm_ssh_private_key_file: ~/.ssh/id_rsa
 # A dictionary of ansible.cfg key:value pairs to set
 # on the remote host
 prepare_adm_ansible_cfg:
