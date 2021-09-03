@@ -2,7 +2,9 @@ prepare_adm_become: true
 prepare_adm_become_user: root
 
 # Local directory from whence to copy group_vars
-#prepare_adm_group_vars_dir: files/prepare_adm/group_vars
+#prepare_adm_group_vars_dir:
+#  - files/prepare_adm/group_vars
+#  - morefiles/otherplace/group_vars
 # Inventory file to upload
 prepare_adm_inventory_file: ~
 

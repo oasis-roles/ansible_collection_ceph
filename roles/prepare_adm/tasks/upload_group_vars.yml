@@ -1,0 +1,13 @@
+    - name: Create list of group_vars files
+      set_fact:
+        _prepare_adm_group_vars: |-
+          {{ ( _prepare_adm_group_vars | default([]) ) +
+          [{'src': item, 'dest': prepare_adm_destination + '/group_vars/' + (item | basename), 'owner': prepare_adm_target_user, 'group': prepare_adm_target_group}] }}
+      with_fileglob:
+        - "{{ group_vars }}/*"
+
+    - name: Copy local group_vars files to destination
+      include_role:
+        name: oasis_roles.system.upload_files
+      vars:
+        upload_files: "{{ _prepare_adm_group_vars }}"
