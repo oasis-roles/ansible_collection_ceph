@@ -32,17 +32,11 @@
         - prepare_adm_inventory_file is not none
         - prepare_adm_inventory_file is file
 
-    - name: Create list of group_vars files
-      set_fact:
-        _prepare_adm_group_vars: "{{ ( _prepare_adm_group_vars | default([]) ) + [{'src': item, 'dest': prepare_adm_destination + '/group_vars/' + (item | basename), 'owner': prepare_adm_target_user, 'group': prepare_adm_target_group, 'mode': '0644'}] }}"
-      with_fileglob:
-        - "{{ prepare_adm_group_vars_dir }}/*"
-
-    - name: Copy local group_vars files to destination
-      include_role:
-        name: oasis_roles.system.upload_files
-      vars:
-        upload_files: "{{ _prepare_adm_group_vars }}"
+    - name: Upload group_vars directories
+      include_tasks: upload_group_vars.yml
+      loop: "{{ prepare_adm_group_vars_dir | default([]) }}"
+      loop_control:
+        loop_var: group_vars
   vars:
     upload_files_become: "{{ prepare_adm_become }}"
     upload_files_become_user: "{{ prepare_adm_become_user }}"

@@ -19,8 +19,9 @@ Currently the following variables are supported:
 
 ### General
 
-* `prepare_adm_group_vars_dir` - Default none. The
-  directory where group vars files should be uploaded FROM.
+* `prepare_adm_group_vars_dir` - Default none. A list of the
+  directories where group vars files should be uploaded FROM. Any name collisions
+  inside of multiple entries will clobber one another.
 * `prepare_adm_inventory_file` - Default: none. The inventory file, if any,
   that should be uploaded to the remote host.
 * `prepare_adm_group_vars_template` - Default: false. Whether files in the
