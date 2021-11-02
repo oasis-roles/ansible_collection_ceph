@@ -42,20 +42,15 @@ jobs:
           # vagrant_build:
           #   needs: collect
           #   uses: oasis-roles/meta_test/.github/workflows/vagrant_build.yml@master
-          #     with:
-          #       checkout_path: oasis_roles/ceph
 
   lint:
     uses: oasis-roles/meta_test/.github/workflows/lint.yml@master
-    with:
-      checkout_path: oasis_roles/ceph
 
   build:
     needs:
       - collect
     uses: oasis-roles/meta_test/.github/workflows/container_build.yml@master
     with:
-      checkout_path: oasis_roles/ceph
       scenarios: "${{ needs.collect.outputs.scenarios }}"
 
   release:
